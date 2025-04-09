@@ -1,3 +1,5 @@
+#youtube-manager application (using SQLite)
+
 import sqlite3
 
 #connect to SQLite databse
