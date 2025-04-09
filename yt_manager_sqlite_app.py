@@ -1,8 +1,13 @@
 import sqlite3
 
+#connect to SQLite databse
 conn = sqlite3.connect("yt_videos.db")
+
+#create cursor object
 cursor = conn.cursor()
 
+#execute database queries using cursor
+#create table
 cursor.execute(''' 
     CREATE TABLE IF NOT EXISTS Videos (
                Id INTEGER PRIMARY KEY,
@@ -11,6 +16,7 @@ cursor.execute('''
                 )
 ''')
 
+#fix conetent indexing
 def fix_indices():
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS New_Videos (
@@ -18,7 +24,7 @@ def fix_indices():
                name TEXT NOT NULL,
                time TEXT NOT NULL
                 )
-''')
+    ''')
     cursor.execute("INSERT INTO New_Videos (name, time) SELECT name, time FROM Videos")
     conn.commit()
     cursor.execute("DROP TABLE Videos")
@@ -26,6 +32,7 @@ def fix_indices():
     cursor.execute("ALTER TABLE New_Videos RENAME TO Videos")
     conn.commit()
 
+#method for listing videos
 def list_all_videos():
     cursor.execute("SELECT * FROM Videos")
     rows = cursor.fetchall()
@@ -35,12 +42,14 @@ def list_all_videos():
         print(f"{row[0]}. title: {row[1]}, duration: {row[2]}\n")
     print('*'*50)
 
+#method for adding video
 def add_video():
     name = input("enter name of the video: ")
     time = input("enter time of the video: ")
     cursor.execute("INSERT INTO Videos (name, time) VALUES (?, ?)",(name, time))
     conn.commit()
 
+#method for updating video
 def update_video():
     id = int(input("enter the id the video: "))
     new_name = input("enter new name: ")
@@ -48,12 +57,14 @@ def update_video():
     cursor.execute('''UPDATE Videos SET name = ? , time = ? WHERE Id= ?''',(new_name, new_time, id))
     conn.commit()
 
+#method for deleting video
 def delete_video():
     id = int(input("enter the video id: "))
     cursor.execute("DELETE FROM Videos WHERE Id = ?" ,(id,))
     conn.commit()
     fix_indices()
 
+#main method: user menu
 def main():
     while True:
         print("\nWelcome to the Youtube-Manager App!\nSelect one of the following options:"\
@@ -83,5 +94,6 @@ def main():
             break
     cursor.close()
 
+#module check
 if __name__ == "__main__":
     main()
